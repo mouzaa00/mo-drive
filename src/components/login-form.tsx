@@ -54,6 +54,21 @@ export function LoginForm({
     });
   }
 
+  async function resetPassword() {
+    const email = loginForm.getValues("email");
+    if (!email) {
+      loginForm.setError("email", {
+        message: "Please enter your email first.",
+      });
+      return;
+    }
+    const { data, error } = await authClient.requestPasswordReset({
+      email,
+      redirectTo: `/reset-password?email=${encodeURIComponent(email)}`,
+    });
+    console.log("Password reset requested:", { data, error });
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -108,12 +123,14 @@ export function LoginForm({
                       >
                         Password
                       </FieldLabel>
-                      <a
-                        href="#"
+                      <Button
+                        onClick={resetPassword}
+                        variant="link"
                         className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                        type="button"
                       >
                         Forgot your password?
-                      </a>
+                      </Button>
                     </div>
                     <Input
                       {...field}
