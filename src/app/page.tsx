@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import Link from "next/link";
+
 import SignOutButton from "~/components/signout";
+import VerifyEmail from "~/components/verify-email";
 import { auth } from "~/lib/auth";
 
 export default async function Home() {
@@ -13,6 +15,11 @@ export default async function Home() {
       {session ? (
         <div>
           <h1>Welcome {session.user.name}</h1>
+          {!session.user.emailVerified ? (
+            <VerifyEmail email={session.user.email} />
+          ) : (
+            <p>email: {session.user.email} is verified</p>
+          )}
           <SignOutButton />
         </div>
       ) : (
