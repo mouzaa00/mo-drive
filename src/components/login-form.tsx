@@ -4,6 +4,7 @@ import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
@@ -54,20 +55,7 @@ export function LoginForm({
     });
   }
 
-  async function resetPassword() {
-    const email = loginForm.getValues("email");
-    if (!email) {
-      loginForm.setError("email", {
-        message: "Please enter your email first.",
-      });
-      return;
-    }
-    const { data, error } = await authClient.requestPasswordReset({
-      email,
-      redirectTo: `/reset-password?email=${encodeURIComponent(email)}`,
-    });
-    console.log("Password reset requested:", { data, error });
-  }
+  const isSubmitting = loginForm.formState.isSubmitting;
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -103,6 +91,7 @@ export function LoginForm({
                       aria-invalid={fieldState.invalid}
                       type="email"
                       placeholder="m@example.com"
+                      disabled={isSubmitting}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -123,19 +112,18 @@ export function LoginForm({
                       >
                         Password
                       </FieldLabel>
-                      <Button
-                        onClick={resetPassword}
-                        variant="link"
+                      <Link
+                        href="/forgot-password"
                         className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                        type="button"
                       >
                         Forgot your password?
-                      </Button>
+                      </Link>
                     </div>
                     <Input
                       {...field}
                       aria-invalid={fieldState.invalid}
                       type="password"
+                      disabled={isSubmitting}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -144,13 +132,17 @@ export function LoginForm({
                 )}
               />
               <Field>
-                <Button
-                  className="bg-teal-700 hover:bg-teal-700/80"
-                  type="submit"
-                >
-                  Login
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
-                <Button variant="outline" type="button">
+                <Button variant="outline" type="button" disabled={isSubmitting}>
                   Login with Google
                 </Button>
                 <FieldDescription className="text-center">

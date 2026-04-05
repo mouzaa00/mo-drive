@@ -3,6 +3,8 @@
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
@@ -15,6 +17,7 @@ import {
 } from "~/components/ui/card";
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -25,10 +28,10 @@ import { authClient } from "~/lib/auth-client";
 
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, "Password must at least be 8 characters."),
+    password: z.string().min(8, "Password must be at least 8 characters."),
     confirmPassword: z
       .string()
-      .min(8, "Confirm Password must at least be 8 characters."),
+      .min(8, "Confirm password must be at least 8 characters."),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -39,6 +42,10 @@ export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  const email = params.get("email");
+
   const resetPasswordForm = useForm<z.infer<typeof resetPasswordSchema>>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -48,15 +55,13 @@ export function ResetPasswordForm({
   });
 
   async function onSubmit(formData: z.infer<typeof resetPasswordSchema>) {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-    const email = params.get("email");
     if (!token) {
       resetPasswordForm.setError("root", {
-        message: "Token is missing from the URL.",
+        message: "Reset token is missing. Please request a new password reset link.",
       });
       return;
     }
+
     await authClient.resetPassword({
       newPassword: formData.password,
       token,
@@ -77,13 +82,40 @@ export function ResetPasswordForm({
     });
   }
 
+  if (!token) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Invalid reset link</CardTitle>
+            <CardDescription>
+              This password reset link is invalid or has expired.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link
+              href="/forgot-password"
+              className="text-sm underline underline-offset-4 hover:underline"
+            >
+              Request a new password reset
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const isSubmitting = resetPasswordForm.formState.isSubmitting;
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Reset your password</CardTitle>
+          <CardTitle>Create new password</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            {email
+              ? `Enter a new password for ${email}`
+              : "Enter a new password for your account"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -106,16 +138,21 @@ export function ResetPasswordForm({
                       data-invalid={fieldState.invalid}
                       htmlFor="password"
                     >
-                      Password
+                      New Password
                     </FieldLabel>
-
                     <Input
                       {...field}
                       aria-invalid={fieldState.invalid}
                       type="password"
+                      placeholder="Enter new password"
+                      disabled={isSubmitting}
                     />
-                    {fieldState.invalid && (
+                    {fieldState.invalid ? (
                       <FieldError errors={[fieldState.error]} />
+                    ) : (
+                      <FieldDescription>
+                        Must be at least 8 characters
+                      </FieldDescription>
                     )}
                   </Field>
                 )}
@@ -128,15 +165,16 @@ export function ResetPasswordForm({
                   <Field>
                     <FieldLabel
                       data-invalid={fieldState.invalid}
-                      htmlFor="password"
+                      htmlFor="confirmPassword"
                     >
-                      Password
+                      Confirm Password
                     </FieldLabel>
-
                     <Input
                       {...field}
                       aria-invalid={fieldState.invalid}
                       type="password"
+                      placeholder="Confirm new password"
+                      disabled={isSubmitting}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -145,12 +183,25 @@ export function ResetPasswordForm({
                 )}
               />
               <Field>
-                <Button
-                  className="bg-teal-700 hover:bg-teal-700/80"
-                  type="submit"
-                >
-                  Reset Password
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" />
+                      Resetting...
+                    </>
+                  ) : (
+                    "Reset Password"
+                  )}
                 </Button>
+                <p className="text-muted-foreground mt-4 text-center text-sm">
+                  Remember your password?{" "}
+                  <Link
+                    href="/login"
+                    className="underline underline-offset-4 hover:underline"
+                  >
+                    Back to login
+                  </Link>
+                </p>
               </Field>
             </FieldGroup>
           </form>
