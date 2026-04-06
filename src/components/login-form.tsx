@@ -142,7 +142,17 @@ export function LoginForm({
                     "Login"
                   )}
                 </Button>
-                <Button variant="outline" type="button" disabled={isSubmitting}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    await authClient.signIn.social({
+                      provider: "google",
+                      callbackURL: "/",
+                    });
+                  }}
+                >
                   Login with Google
                 </Button>
                 <FieldDescription className="text-center">
