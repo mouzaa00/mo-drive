@@ -44,8 +44,8 @@ export function LoginForm({
 
   async function onSubmit(formData: z.infer<typeof loginSchema>) {
     await authClient.signIn.email({
-      email: formData.email,
-      password: formData.password,
+      email: formData.email.toLowerCase(),
+      password: formData.password.toLowerCase(),
       callbackURL: "/",
       fetchOptions: {
         onError: (ctx) => {

@@ -57,8 +57,8 @@ export function SignupForm({
 
   async function onSubmit(formData: z.infer<typeof signupSchema>) {
     await authClient.signUp.email({
-      email: formData.email,
-      name: formData.name,
+      email: formData.email.toLowerCase(),
+      name: formData.name.toLowerCase(),
       password: formData.password,
       fetchOptions: {
         onError: (ctx) => {
