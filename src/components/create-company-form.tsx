@@ -1,11 +1,14 @@
 "use client";
 
-import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Rocket } from "lucide-react";
 
 import { cn } from "~/lib/utils";
+import {
+  createCompanySchema,
+  CreateCompanyInput,
+} from "~/lib/validations/company";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -22,38 +25,42 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { redirect } from "next/navigation";
 
-const projectSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Project name must be at least 2 characters")
-    .max(50, "Project name must be less than 50 characters"),
-});
-
-export function ProjectForm({
+export function CreateCompanyForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const form = useForm<z.infer<typeof projectSchema>>({
-    resolver: zodResolver(projectSchema),
+  const createCompanyForm = useForm<CreateCompanyInput>({
+    resolver: zodResolver(createCompanySchema),
     defaultValues: {
       name: "",
+      slug: "",
     },
   });
 
-  async function onSubmit(formData: z.infer<typeof projectSchema>) {
-    console.log("Creating project:", formData.name);
-
-    await fetch("/api/projects", {
+  async function onSubmit(formData: CreateCompanyInput) {
+    const res = await fetch("/api/companies", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      createCompanyForm.setError("root", {
+        message: data.error || "Something went wrong",
+      });
+      return;
+    }
+
+    redirect("/");
   }
 
-  const isSubmitting = form.formState.isSubmitting;
+  const isSubmitting = createCompanyForm.formState.isSubmitting;
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -62,18 +69,24 @@ export function ProjectForm({
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Rocket className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Launch a new project</CardTitle>
+          <CardTitle className="text-2xl">Add your company</CardTitle>
           <CardDescription className="max-w-70 mx-auto">
-            Give your project a name to get started. You can always change it
-            later.
+            Start by creating a company for your projects and feature requests
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={createCompanyForm.handleSubmit(onSubmit)}>
             <FieldGroup>
+              <Field>
+                {createCompanyForm.formState.errors.root && (
+                  <FieldError
+                    errors={[createCompanyForm.formState.errors.root]}
+                  />
+                )}
+              </Field>
               <Controller
                 name="name"
-                control={form.control}
+                control={createCompanyForm.control}
                 rules={{ required: true }}
                 render={({ field, fieldState }) => (
                   <Field>
@@ -88,13 +101,41 @@ export function ProjectForm({
                       aria-invalid={fieldState.invalid}
                       id="name"
                       type="text"
-                      placeholder="My awesome project"
+                      placeholder="My Awesome Company"
                       disabled={isSubmitting}
-                      autoFocus
-                      autoComplete="off"
                     />
                     <FieldDescription>
-                      Choose a name that describes your project clearly
+                      This is the name of your company that will be displayed to
+                      users
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="slug"
+                control={createCompanyForm.control}
+                rules={{ required: true }}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel
+                      data-invalid={fieldState.invalid}
+                      htmlFor="slug"
+                    >
+                      Company slug
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                      id="slug"
+                      type="text"
+                      placeholder="my-awesome-slug"
+                      disabled={isSubmitting}
+                    />
+                    <FieldDescription>
+                      This will be used in your project URL and must be unique
                     </FieldDescription>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -111,10 +152,10 @@ export function ProjectForm({
                   {isSubmitting ? (
                     <>
                       <Loader2 className="animate-spin" />
-                      Creating project...
+                      Creating company...
                     </>
                   ) : (
-                    "Create project"
+                    "Create company"
                   )}
                 </Button>
               </Field>
