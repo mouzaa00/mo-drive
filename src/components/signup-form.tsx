@@ -65,7 +65,7 @@ export function SignupForm({
           signupForm.setError("root", { message: ctx.error.message });
         },
         onSuccess: () => {
-          redirect("/");
+          redirect("/company/new");
         },
       },
     });

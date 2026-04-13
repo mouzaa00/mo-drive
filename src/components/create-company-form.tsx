@@ -57,7 +57,7 @@ export function CreateCompanyForm({
       return;
     }
 
-    redirect("/");
+    redirect(`http://${data.slug}.localhost:3000/feature-requests`);
   }
 
   const isSubmitting = createCompanyForm.formState.isSubmitting;
