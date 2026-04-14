@@ -1,12 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  pgTable,
-  text,
-  timestamp,
-  boolean,
-  index,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
@@ -98,51 +91,3 @@ export const accountRelations = relations(accountsTable, ({ one }) => ({
     references: [usersTable.id],
   }),
 }));
-
-export const companiesTable = pgTable("companies", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull().unique(),
-  slug: text("slug").notNull().unique(),
-  ownerId: text("owner_id")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
-
-export const featureRequestsTable = pgTable("feature_requests", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  companyId: uuid("company_id")
-    .notNull()
-    .references(() => companiesTable.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
-
-export const projectRelations = relations(companiesTable, ({ one, many }) => ({
-  owner: one(usersTable, {
-    fields: [companiesTable.ownerId],
-    references: [usersTable.id],
-  }),
-  featureRequests: many(featureRequestsTable),
-}));
-
-export const featureRequestRelations = relations(
-  featureRequestsTable,
-  ({ one }) => ({
-    company: one(companiesTable, {
-      fields: [featureRequestsTable.companyId],
-      references: [companiesTable.id],
-    }),
-  }),
-);
-
-export type CreateCompany = typeof companiesTable.$inferInsert;
