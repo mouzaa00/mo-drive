@@ -76,6 +76,7 @@ export const verificationsTable = pgTable(
 export const userRelations = relations(usersTable, ({ many }) => ({
   sessions: many(sessionsTable),
   accounts: many(accountsTable),
+  orgs: many(orgMembersTable),
 }));
 
 export const sessionRelations = relations(sessionsTable, ({ one }) => ({
@@ -89,5 +90,46 @@ export const accountRelations = relations(accountsTable, ({ one }) => ({
   user: one(usersTable, {
     fields: [accountsTable.userId],
     references: [usersTable.id],
+  }),
+}));
+
+export const orgsTable = pgTable("orgs", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const orgRelations = relations(orgsTable, ({ many }) => ({
+  members: many(orgMembersTable),
+}));
+
+export const orgMembersTable = pgTable("org_members", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  orgId: text("org_id")
+    .notNull()
+    .references(() => orgsTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const orgMemberRelations = relations(orgMembersTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [orgMembersTable.userId],
+    references: [usersTable.id],
+  }),
+  org: one(orgsTable, {
+    fields: [orgMembersTable.orgId],
+    references: [orgsTable.id],
   }),
 }));

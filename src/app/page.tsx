@@ -1,8 +1,7 @@
 import { headers } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import SignOutButton from "~/components/signout";
-import VerifyEmail from "~/components/verify-email";
 import { auth } from "~/lib/auth";
 
 export default async function Home() {
@@ -10,21 +9,13 @@ export default async function Home() {
     headers: await headers(),
   });
 
+  if (session) {
+    redirect("/organization/new");
+  }
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      {session ? (
-        <div>
-          <h1>Welcome {session.user.name}</h1>
-          {!session.user.emailVerified ? (
-            <VerifyEmail email={session.user.email} />
-          ) : (
-            <p>email: {session.user.email} is verified</p>
-          )}
-          <SignOutButton />
-        </div>
-      ) : (
-        <Link href={"/signup"}>Sign up</Link>
-      )}
+      <Link href={"/signup"}>Sign up</Link>
     </div>
   );
 }
