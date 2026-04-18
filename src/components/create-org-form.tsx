@@ -1,6 +1,5 @@
 "use client";
 
-import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -37,16 +36,17 @@ export function CreateOrgForm({
 
   async function onSubmit(formData: CreateOrg) {
     try {
-      const res = await fetch("/api/orgs", {
+      await fetch("/api/orgs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
     } catch (err) {
-      console.log(err);
+      orgForm.setError("root", {
+        message: (err as Error).message || "Something went wrong!",
+      });
     }
   }
 
