@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { SignOut } from "~/components/sign-out";
 
 import { auth } from "~/lib/auth";
 
@@ -9,13 +9,21 @@ export default async function Home() {
     headers: await headers(),
   });
 
-  if (session) {
-    redirect("/dashboard");
-  }
-
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <Link href={"/signup"}>Sign up</Link>
+      {!session ? (
+        <Link href={"/login"}>login</Link>
+      ) : (
+        <div className="flex flex-col">
+          <span>{session.user.email}</span>
+          <span>{session.user.name}</span>
+          <SignOut />
+        </div>
+      )}
     </div>
   );
+}
+
+export async function UserOrgs() {
+  return <div>Orgs</div>;
 }

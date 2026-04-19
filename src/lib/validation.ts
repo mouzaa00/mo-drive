@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const createOrgSchema = z.object({
+export const createOrganizationSchema = z.object({
   name: z
     .string()
     .min(2, "Org name must be at least 2 characters")
@@ -15,4 +15,4 @@ export const createOrgSchema = z.object({
     .max(50, "Slug must be at most 50 characters"),
 });
 
-export type CreateOrg = z.infer<typeof createOrgSchema>;
+export type CreateOrganization = z.infer<typeof createOrganizationSchema>;

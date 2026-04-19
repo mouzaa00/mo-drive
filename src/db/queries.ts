@@ -1,20 +1,32 @@
-import { CreateOrg } from "~/lib/validation";
 import { db } from ".";
-import { orgMembersTable, orgsTable } from "./schema";
+import { membershipsTable, organizationsTable } from "./schema";
 
-export async function createOrg(data: CreateOrg & { userId: string }) {
-  const result = await db
-    .insert(orgsTable)
-    .values({
-      id: crypto.randomUUID(),
-      name: data.name,
-      slug: data.slug,
-    })
-    .returning({ orgId: orgsTable.id });
+// if step 2 fails for any reason
+// Drizzle automatically rolls back step 1. No orphened data!
+export async function createOrganizationWithOwner(
+  userId: string,
+  orgName: string,
+  orgSlug: string,
+) {
+  // We use db.transaction to ensure ATOMICITY (all-or-nothing)
+  return await db.transaction(async (tx) => {
+    // 1. create organization
+    // we use .returning() to get the newly created org's ID immediately
+    const [newOrganization] = await tx
+      .insert(organizationsTable)
+      .values({
+        name: orgName,
+        slug: orgSlug,
+      })
+      .returning({ id: organizationsTable.id });
 
-  await db.insert(orgMembersTable).values({
-    id: crypto.randomUUID(),
-    userId: data.userId,
-    orgId: result[0].orgId,
+    // 2. create membership linking the User to the new Org
+    await tx.insert(membershipsTable).values({
+      userId: userId,
+      organizationId: newOrganization.id,
+      role: "owner", // Explicitly setting the role we defined in our enum
+    });
+
+    return newOrganization;
   });
 }

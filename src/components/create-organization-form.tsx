@@ -20,29 +20,31 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { CreateOrg, createOrgSchema } from "~/lib/validation";
+import { CreateOrganization, createOrganizationSchema } from "~/lib/validation";
+import { redirect } from "next/navigation";
 
-export function CreateOrgForm({
+export function CreateOrganizationForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const orgForm = useForm<CreateOrg>({
-    resolver: zodResolver(createOrgSchema),
+  const orgForm = useForm<CreateOrganization>({
+    resolver: zodResolver(createOrganizationSchema),
     defaultValues: {
       name: "",
       slug: "",
     },
   });
 
-  async function onSubmit(formData: CreateOrg) {
+  async function onSubmit(formData: CreateOrganization) {
     try {
-      await fetch("/api/orgs", {
+      await fetch("/api/organizations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
+      redirect("/");
     } catch (err) {
       orgForm.setError("root", {
         message: (err as Error).message || "Something went wrong!",
