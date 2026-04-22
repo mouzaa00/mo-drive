@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -6,8 +5,6 @@ import {
   boolean,
   index,
   pgEnum,
-  uniqueIndex,
-  uuid,
 } from "drizzle-orm/pg-core";
 
 export const membershipRoleEnum = pgEnum("membership_role", [
@@ -87,75 +84,3 @@ export const verificationsTable = pgTable(
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
-
-export const organizationsTable = pgTable("organizations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
-
-export const membershipsTable = pgTable(
-  "memberships",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => usersTable.id, { onDelete: "cascade" }),
-    organizationId: uuid("org_id")
-      .notNull()
-      .references(() => organizationsTable.id, { onDelete: "cascade" }),
-    role: membershipRoleEnum("role").notNull().default("member"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
-  },
-  (table) => [
-    // Prevent inviting the same user to an org twice
-    uniqueIndex("user_org_unique_idx").on(table.userId, table.organizationId),
-  ],
-);
-
-export const usersRelations = relations(usersTable, ({ many }) => ({
-  sessions: many(sessionsTable),
-  accounts: many(accountsTable),
-  memberships: many(membershipsTable),
-}));
-
-export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [sessionsTable.userId],
-    references: [usersTable.id],
-  }),
-}));
-
-export const accountsRelations = relations(accountsTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [accountsTable.userId],
-    references: [usersTable.id],
-  }),
-}));
-
-export const organizationsRelations = relations(
-  organizationsTable,
-  ({ many }) => ({
-    memberships: many(membershipsTable),
-  }),
-);
-
-export const membershipsRelations = relations(membershipsTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [membershipsTable.userId],
-    references: [usersTable.id],
-  }),
-  org: one(organizationsTable, {
-    fields: [membershipsTable.organizationId],
-    references: [organizationsTable.id],
-  }),
-}));
