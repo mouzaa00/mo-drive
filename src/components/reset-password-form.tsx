@@ -23,7 +23,7 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { authClient } from "~/lib/auth-client";
 
 const resetPasswordSchema = z
@@ -42,7 +42,7 @@ export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const params = new URLSearchParams(window.location.search);
+  const params = useSearchParams();
   const token = params.get("token");
   const email = params.get("email");
 
@@ -57,7 +57,8 @@ export function ResetPasswordForm({
   async function onSubmit(formData: z.infer<typeof resetPasswordSchema>) {
     if (!token) {
       resetPasswordForm.setError("root", {
-        message: "Reset token is missing. Please request a new password reset link.",
+        message:
+          "Reset token is missing. Please request a new password reset link.",
       });
       return;
     }
