@@ -4,6 +4,6 @@ Upload file to a cloud drive (using s3)
 
 ## TODO
 
-- [ ] scaffold a basic ui with mock data
+- [x] scaffold a basic ui with mock data
 - [ ]
 - [ ]
