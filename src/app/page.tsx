@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { FileBrowser } from "~/components/file-browser";
+import { FileBrowser } from "./file-browser";
 import { SignOut } from "~/components/sign-out";
 import { auth } from "~/lib/auth";
 

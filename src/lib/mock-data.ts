@@ -1,16 +1,26 @@
-export type MockFile = {
+export type File = {
   id: string;
   name: string;
-  type: "folder" | "file";
-  parent: string | null;
-  size?: string;
-  url?: string;
+  type: "file";
+  parent: string;
+  size: string;
+  url: string;
 };
 
-export const mockFiles: MockFile[] = [
-  { id: "1", name: "Documents", type: "folder", parent: null },
-  { id: "2", name: "Photos", type: "folder", parent: null },
-  { id: "3", name: "Work", type: "folder", parent: null },
+export type Folder = {
+  id: string;
+  name: string;
+  type: "folder";
+  parent: string;
+};
+
+export const mockFolders: Folder[] = [
+  { id: "1", name: "Documents", type: "folder", parent: "root" },
+  { id: "2", name: "Photos", type: "folder", parent: "root" },
+  { id: "3", name: "Work", type: "folder", parent: "root" },
+];
+
+export const mockFiles: File[] = [
   {
     id: "4",
     name: "Resume.pdf",
