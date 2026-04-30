@@ -5,6 +5,7 @@ import {
   boolean,
   index,
   pgEnum,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const membershipRoleEnum = pgEnum("membership_role", [
@@ -84,3 +85,17 @@ export const verificationsTable = pgTable(
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
+
+export const filesTable = pgTable("files", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  name: text("name").notNull(),
+  size: integer("size").notNull(),
+  url: text("url").notNull(),
+  parentId: integer("parent_id"),
+});
+
+export const foldersTable = pgTable("folders", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  name: text("name").notNull(),
+  parentId: integer("parent_id"),
+});
