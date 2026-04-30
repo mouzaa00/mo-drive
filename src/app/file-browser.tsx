@@ -113,7 +113,7 @@ export function FileBrowser() {
     const folder = mockFolders.find((folder) => folder.id === folderId);
     if (folder) {
       path.unshift({ id: folder.id, name: folder.name });
-      folderId = folder.parent;
+      folderId = folder.parent as string;
     }
   }
   path.unshift({ id: "root", name: "My Drive" });
@@ -151,16 +151,18 @@ export function FileBrowser() {
                 handleFolderClick={() => handleNavigate(folder.id)}
               />
             ))}
-            {currentFiles.length === 0 && currentFolderId !== "root" && (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="py-8 text-center text-muted-foreground"
-                >
-                  This folder is empty
-                </TableCell>
-              </TableRow>
-            )}
+            {currentFiles.length === 0 &&
+              currentFolders.length === 0 &&
+              currentFolderId !== "root" && (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    This folder is empty
+                  </TableCell>
+                </TableRow>
+              )}
           </TableBody>
         </Table>
       </div>
