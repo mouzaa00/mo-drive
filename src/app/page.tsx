@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { FileBrowser } from "./file-browser";
 import { SignOut } from "~/components/sign-out";
 import { auth } from "~/lib/auth";
+import { db } from "~/db";
+import { filesTable, foldersTable } from "~/db/schema";
 
 export default async function Home() {
   const session = await auth.api.getSession({
@@ -13,6 +15,8 @@ export default async function Home() {
   if (!session) {
     redirect("/login");
   }
+  const folders = await db.select().from(foldersTable);
+  const files = await db.select().from(filesTable);
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,7 +28,7 @@ export default async function Home() {
         <SignOut />
       </header>
       <main className="w-full max-w-none p-6">
-        <FileBrowser />
+        <FileBrowser folders={folders} files={files} />
       </main>
     </div>
   );
