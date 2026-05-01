@@ -61,13 +61,6 @@ export function FileBrowser(props: {
 }) {
   const [currentFolderId, setCurrentFolderId] = useState<number>(1);
 
-  const currentFiles = props.files.filter(
-    (file) => file.parentId === currentFolderId,
-  );
-  const currentFolders = props.folders.filter(
-    (folder) => folder.parentId === currentFolderId,
-  );
-
   const breadcrumbs = [];
   let folderId = currentFolderId;
 
@@ -119,18 +112,18 @@ export function FileBrowser(props: {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentFolders.map((folder) => (
+            {props.folders.map((folder) => (
               <FolderRow
                 key={folder.id}
                 folder={folder}
                 handleFolderClick={() => handleNavigate(folder.id)}
               />
             ))}
-            {currentFiles.map((file) => (
+            {props.files.map((file) => (
               <FileRow key={file.id} file={file} />
             ))}
-            {currentFiles.length === 0 &&
-              currentFolders.length === 0 &&
+            {props.files.length === 0 &&
+              props.folders.length === 0 &&
               currentFolderId !== 1 && (
                 <TableRow>
                   <TableCell
