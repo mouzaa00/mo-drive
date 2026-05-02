@@ -11,3 +11,7 @@ Upload file to a cloud drive (using s3)
 - [ ] add file uploading
 - [ ] home page
 - [ ] add analytics
+
+## Notes
+
+- [x] the entire file row should be a link, not only the file's name

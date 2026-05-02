@@ -13,19 +13,23 @@ import type { filesTable, foldersTable } from "~/db/schema";
 export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
   return (
     <TableRow className="cursor-pointer hover:bg-muted/50">
-      <TableCell className="flex items-center gap-3 py-3">
-        <span className="shrink-0">
-          <FileIcon className="w-5 h-5 text-gray-500" />
-        </span>
+      <TableCell>
         <a
           href={file.url}
           target="_blank"
-          className="font-medium text-foreground"
+          className="flex items-center gap-3 py-3"
         >
-          {file.name}
+          <span className="shrink-0">
+            <FileIcon className="w-5 h-5 text-gray-500" />
+          </span>
+          <span className="font-medium text-foreground">{file.name}</span>
         </a>
       </TableCell>
-      <TableCell>{file.size}</TableCell>
+      <TableCell>
+        <a href={file.url} target="_blank" className="flex py-3">
+          {file.size}
+        </a>
+      </TableCell>
     </TableRow>
   );
 }
@@ -46,7 +50,9 @@ export function FolderRow({
         </Link>
       </TableCell>
       <TableCell>
-        <Link href={`/f/${folder.id}`}>{"—"}</Link>
+        <Link href={`/f/${folder.id}`} className="flex py-3">
+          {"—"}
+        </Link>
       </TableCell>
     </TableRow>
   );
