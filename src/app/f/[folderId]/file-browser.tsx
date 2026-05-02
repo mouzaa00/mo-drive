@@ -1,3 +1,5 @@
+"use client";
+
 import { FileIcon, FolderIcon } from "lucide-react";
 import Link from "next/link";
 import {
@@ -9,6 +11,7 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import type { filesTable, foldersTable } from "~/db/schema";
+import { UploadButton } from "~/lib/uploadthing";
 
 export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
   return (
@@ -82,10 +85,11 @@ export function FileBrowser(props: {
             </span>
           ))}
         </nav>
-        <button className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+        <UploadButton endpoint="imageUploader" />
+        {/* <button className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
           <FileIcon className="h-4 w-4" />
           New upload
-        </button>
+        </button> */}
       </div>
       <div className="rounded-md border">
         <Table>

@@ -30,3 +30,7 @@ export function getFolders(folderId: number) {
 export function getFiles(folderId: number) {
   return db.select().from(filesTable).where(eq(filesTable.parentId, folderId));
 }
+
+export async function createFile(input: typeof filesTable.$inferInsert) {
+  await db.insert(filesTable).values(input);
+}

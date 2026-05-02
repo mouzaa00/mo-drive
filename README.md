@@ -14,4 +14,6 @@ Upload file to a cloud drive (using s3)
 
 ## Notes
 
-- [x] the entire file row should be a link, not only the file's name
+- [ ] upload files to the right folder
+- [ ] delete file
+- [ ] allow other types to be uploaded, for now only images are allowed
