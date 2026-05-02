@@ -55,9 +55,8 @@ export function FolderRow({
 export function FileBrowser(props: {
   files: (typeof filesTable.$inferSelect)[];
   folders: (typeof foldersTable.$inferSelect)[];
+  parents: (typeof foldersTable.$inferSelect)[];
 }) {
-  const breadcrumbs: unknown[] = [];
-
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center justify-between">
@@ -65,7 +64,7 @@ export function FileBrowser(props: {
           <Link href="/f/1" className="text-blue-600 hover:underline">
             My Drive
           </Link>
-          {breadcrumbs.map((folder) => (
+          {props.parents.map((folder) => (
             <span key={folder.id} className="flex items-center gap-2">
               <span className="text-gray-400">/</span>
               <Link
