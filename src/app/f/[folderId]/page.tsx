@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 
-import { FileBrowser } from "../../file-browser";
+import { FileBrowser } from "./file-browser";
 import { SignOut } from "~/components/sign-out";
 import { auth } from "~/lib/auth";
 import { db } from "~/db";

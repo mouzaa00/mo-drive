@@ -1,7 +1,5 @@
-"use client";
-
-import { useState } from "react";
 import { FileIcon, FolderIcon } from "lucide-react";
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -34,23 +32,22 @@ export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
 
 export function FolderRow({
   folder,
-  handleFolderClick,
 }: {
   folder: typeof foldersTable.$inferSelect;
-  handleFolderClick: () => void;
 }) {
   return (
-    <TableRow
-      className="cursor-pointer hover:bg-muted/50"
-      onClick={handleFolderClick}
-    >
-      <TableCell className="flex items-center gap-3 py-3">
-        <span className="shrink-0">
-          <FolderIcon className="w-5 h-5 text-blue-500" />
-        </span>
-        <span className="font-medium text-foreground">{folder.name}</span>
+    <TableRow className="cursor-pointer hover:bg-muted/50">
+      <TableCell>
+        <Link href={`/f/${folder.id}`} className="flex items-center gap-3 py-3">
+          <span className="shrink-0">
+            <FolderIcon className="w-5 h-5 text-blue-500" />
+          </span>
+          <span className="font-medium text-foreground">{folder.name}</span>
+        </Link>
       </TableCell>
-      <TableCell>{"—"}</TableCell>
+      <TableCell>
+        <Link href={`/f/${folder.id}`}>{"—"}</Link>
+      </TableCell>
     </TableRow>
   );
 }
@@ -59,42 +56,24 @@ export function FileBrowser(props: {
   files: (typeof filesTable.$inferSelect)[];
   folders: (typeof foldersTable.$inferSelect)[];
 }) {
-  const [currentFolderId, setCurrentFolderId] = useState<number>(1);
-
-  const breadcrumbs = [];
-  let folderId = currentFolderId;
-
-  while (folderId !== 1) {
-    const folder = props.folders.find((folder) => folder.id === folderId);
-    if (folder) {
-      breadcrumbs.unshift(folder);
-      folderId = folder.parentId ?? 1;
-    }
-  }
-
-  const handleNavigate = (id: number) => {
-    setCurrentFolderId(id);
-  };
+  const breadcrumbs: unknown[] = [];
 
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center justify-between">
         <nav className="flex items-center gap-2 text-sm">
-          <button
-            onClick={() => handleNavigate(1)}
-            className="text-blue-600 hover:underline"
-          >
+          <Link href="/f/1" className="text-blue-600 hover:underline">
             My Drive
-          </button>
+          </Link>
           {breadcrumbs.map((folder) => (
             <span key={folder.id} className="flex items-center gap-2">
               <span className="text-gray-400">/</span>
-              <button
-                onClick={() => handleNavigate(folder.id)}
+              <Link
+                href={`/f/${folder.id}`}
                 className="text-blue-600 hover:underline"
               >
                 {folder.name}
-              </button>
+              </Link>
             </span>
           ))}
         </nav>
@@ -105,7 +84,7 @@ export function FileBrowser(props: {
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead className="w-1/2">Name</TableHead>
               <TableHead className="w-1/2">Size</TableHead>
@@ -113,27 +92,21 @@ export function FileBrowser(props: {
           </TableHeader>
           <TableBody>
             {props.folders.map((folder) => (
-              <FolderRow
-                key={folder.id}
-                folder={folder}
-                handleFolderClick={() => handleNavigate(folder.id)}
-              />
+              <FolderRow key={folder.id} folder={folder} />
             ))}
             {props.files.map((file) => (
               <FileRow key={file.id} file={file} />
             ))}
-            {props.files.length === 0 &&
-              props.folders.length === 0 &&
-              currentFolderId !== 1 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="py-8 text-center text-muted-foreground"
-                  >
-                    This folder is empty
-                  </TableCell>
-                </TableRow>
-              )}
+            {props.files.length === 0 && props.folders.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="py-8 text-center text-muted-foreground"
+                >
+                  This folder is empty
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
