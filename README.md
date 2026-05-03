@@ -14,6 +14,7 @@ Upload file to a cloud drive (using s3)
 
 ## Notes
 
-- [ ] upload files to the right folder
+- [x] add ownership to files and folders
+- [x] upload files to the right folder
 - [ ] delete file
 - [ ] allow other types to be uploaded, for now only images are allowed
