@@ -17,4 +17,5 @@ Upload file to a cloud drive (using s3)
 - [x] add ownership to files and folders
 - [x] upload files to the right folder
 - [ ] delete file
-- [ ] allow other types to be uploaded, for now only images are allowed
+- [x] allow other types to be uploaded, for now only images are allowed
+- [ ] only the owner of a folder/file should be able to see it

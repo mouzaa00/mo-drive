@@ -98,7 +98,7 @@ export function FileBrowser(props: {
           ))}
         </nav>
         <UploadButton
-          endpoint="imageUploader"
+          endpoint="driveUploader"
           onClientUploadComplete={() => {
             route.refresh();
           }}
