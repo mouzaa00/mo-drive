@@ -1,7 +1,8 @@
 import { headers } from "next/headers";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { createFile } from "~/db/queries";
+import z from "zod";
+import { createFile, getFolderById } from "~/db/queries";
 import { auth } from "~/lib/auth";
 
 const f = createUploadthing();
@@ -19,25 +20,35 @@ export const ourFileRouter = {
       maxFileCount: 1,
     },
   })
+    .input(
+      z.object({
+        folderId: z.string(),
+      }),
+    )
     // Set permissions and file types for this FileRoute
-    .middleware(async () => {
+    .middleware(async ({ input }) => {
       // This code runs on your server before upload
       const session = await auth.api.getSession({
         headers: await headers(),
       });
-
       // If you throw, the user will not be able to upload
       if (!session) throw new UploadThingError("Unauthorized");
 
+      const folder = await getFolderById(input.folderId);
+      if (!folder) throw new UploadThingError("Folder not found");
+      if (folder.ownerId !== session.user.id)
+        throw new UploadThingError("Unauthorized");
+
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
-      return { userId: session.user.id };
+      return { userId: session.user.id, parentId: folder.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       await createFile({
         name: file.name,
         url: file.ufsUrl,
         size: file.size,
-        parentId: 1,
+        ownerId: metadata.userId,
+        parentId: metadata.parentId,
       });
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback

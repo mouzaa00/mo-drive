@@ -19,15 +19,11 @@ export default async function DrivePage({
   }
 
   const { folderId } = await params;
-  const parsedFolderId = parseInt(folderId);
-  if (isNaN(parsedFolderId)) {
-    return <div>Not a valid folder id</div>;
-  }
 
   const [folders, files, parents] = await Promise.all([
-    getFolders(parsedFolderId),
-    getFiles(parsedFolderId),
-    getAllParentsForFolder(parsedFolderId),
+    getFolders(folderId),
+    getFiles(folderId),
+    getAllParentsForFolder(folderId),
   ]);
 
   return (
@@ -40,7 +36,12 @@ export default async function DrivePage({
         <SignOut />
       </header>
       <main className="w-full max-w-none p-6">
-        <FileBrowser folders={folders} files={files} parents={parents} />
+        <FileBrowser
+          folders={folders}
+          files={files}
+          parents={parents}
+          currentFolderId={folderId}
+        />
       </main>
     </div>
   );

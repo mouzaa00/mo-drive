@@ -2,6 +2,8 @@
 
 import { FileIcon, FolderIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Fragment } from "react";
 import {
   Table,
   TableBody,
@@ -65,31 +67,43 @@ export function FileBrowser(props: {
   files: (typeof filesTable.$inferSelect)[];
   folders: (typeof foldersTable.$inferSelect)[];
   parents: (typeof foldersTable.$inferSelect)[];
+  currentFolderId: string;
 }) {
+  const route = useRouter();
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center justify-between">
         <nav className="flex items-center gap-2 text-sm">
-          <Link href="/f/1" className="text-blue-600 hover:underline">
-            My Drive
-          </Link>
           {props.parents.map((folder) => (
-            <span key={folder.id} className="flex items-center gap-2">
-              <span className="text-gray-400">/</span>
-              <Link
-                href={`/f/${folder.id}`}
-                className="text-blue-600 hover:underline"
-              >
-                {folder.name}
-              </Link>
-            </span>
+            <Fragment key={folder.id}>
+              {folder.name === "root" ? (
+                <Link
+                  href={`/f/${folder.id}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  My Drive
+                </Link>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <span className="text-gray-400">/</span>
+                  <Link
+                    href={`/f/${folder.id}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {folder.name}
+                  </Link>
+                </span>
+              )}
+            </Fragment>
           ))}
         </nav>
-        <UploadButton endpoint="imageUploader" />
-        {/* <button className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
-          <FileIcon className="h-4 w-4" />
-          New upload
-        </button> */}
+        <UploadButton
+          endpoint="imageUploader"
+          onClientUploadComplete={() => {
+            route.refresh();
+          }}
+          input={{ folderId: props.currentFolderId }}
+        />
       </div>
       <div className="rounded-md border">
         <Table>

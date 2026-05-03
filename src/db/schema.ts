@@ -6,6 +6,7 @@ import {
   index,
   pgEnum,
   integer,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const membershipRoleEnum = pgEnum("membership_role", [
@@ -86,16 +87,42 @@ export const verificationsTable = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const filesTable = pgTable("files", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  name: text("name").notNull(),
-  size: integer("size").notNull(),
-  url: text("url").notNull(),
-  parentId: integer("parent_id"),
-});
+export const filesTable = pgTable(
+  "files",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    size: integer("size").notNull(),
+    url: text("url").notNull(),
+    parentId: text("parent_id"),
+    ownerId: text("owner_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("file_parent_id_index").on(table.parentId),
+    index("file_owner_id_index").on(table.ownerId),
+  ],
+);
 
-export const foldersTable = pgTable("folders", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  name: text("name").notNull(),
-  parentId: integer("parent_id"),
-});
+export const foldersTable = pgTable(
+  "folders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    parentId: text("parent_id"),
+    ownerId: text("owner_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("folder_parent_id_index").on(table.parentId),
+    index("folder_owner_id_index").on(table.ownerId),
+  ],
+);
