@@ -1,9 +1,11 @@
 "use client";
 
-import { FileIcon, FolderIcon } from "lucide-react";
+import { FileIcon, FolderIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment } from "react";
+import { deleteFile } from "~/app/actions";
+import { Button } from "~/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,6 +18,8 @@ import type { filesTable, foldersTable } from "~/db/schema";
 import { UploadButton } from "~/lib/uploadthing";
 
 export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
+  const navigate = useRouter();
+
   return (
     <TableRow className="cursor-pointer hover:bg-muted/50">
       <TableCell>
@@ -34,6 +38,17 @@ export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
         <a href={file.url} target="_blank" className="flex py-3">
           {file.size}
         </a>
+      </TableCell>
+      <TableCell>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            deleteFile(file.id);
+            navigate.refresh();
+          }}
+        >
+          <Trash2Icon />
+        </Button>
       </TableCell>
     </TableRow>
   );
@@ -59,6 +74,7 @@ export function FolderRow({
           {"—"}
         </Link>
       </TableCell>
+      <TableCell></TableCell>
     </TableRow>
   );
 }
@@ -69,7 +85,8 @@ export function FileBrowser(props: {
   parents: (typeof foldersTable.$inferSelect)[];
   currentFolderId: string;
 }) {
-  const route = useRouter();
+  const navigate = useRouter();
+
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center justify-between">
@@ -100,7 +117,7 @@ export function FileBrowser(props: {
         <UploadButton
           endpoint="driveUploader"
           onClientUploadComplete={() => {
-            route.refresh();
+            navigate.refresh();
           }}
           input={{ folderId: props.currentFolderId }}
         />
@@ -111,6 +128,7 @@ export function FileBrowser(props: {
             <TableRow>
               <TableHead className="w-1/2">Name</TableHead>
               <TableHead className="w-1/2">Size</TableHead>
+              <TableHead className="w-20"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
