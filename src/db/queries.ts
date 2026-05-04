@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "~/db";
 import { filesTable, foldersTable } from "~/db/schema";
 
@@ -38,4 +38,45 @@ export async function getFolderById(folderId: string) {
     .from(foldersTable)
     .where(eq(foldersTable.id, folderId));
   return folder;
+}
+
+export async function getRootFolderForUser(userId: string) {
+  const [root] = await db
+    .selectDistinct()
+    .from(foldersTable)
+    .where(
+      and(eq(foldersTable.ownerId, userId), isNull(foldersTable.parentId)),
+    );
+  return root;
+}
+
+export async function onboardUser(userId: string) {
+  const [rootFolder] = await db
+    .insert(foldersTable)
+    .values({
+      name: "root",
+      ownerId: userId,
+      parentId: null,
+    })
+    .returning();
+
+  await db.insert(foldersTable).values([
+    {
+      name: "Documents",
+      ownerId: userId,
+      parentId: rootFolder.id,
+    },
+    {
+      name: "Starred",
+      ownerId: userId,
+      parentId: rootFolder.id,
+    },
+    {
+      name: "Photos",
+      ownerId: userId,
+      parentId: rootFolder.id,
+    },
+  ]);
+
+  return rootFolder;
 }

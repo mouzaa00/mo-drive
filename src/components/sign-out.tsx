@@ -12,7 +12,7 @@ export function SignOut() {
         await authClient.signOut({
           fetchOptions: {
             onSuccess: () => {
-              redirect("/login");
+              redirect("/");
             },
           },
         })

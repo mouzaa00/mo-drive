@@ -15,7 +15,7 @@ export default async function DrivePage({
   });
 
   if (!session) {
-    redirect("/login");
+    redirect("/");
   }
 
   const { folderId } = await params;
