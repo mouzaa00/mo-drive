@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { UTApi } from "uploadthing/server";
 import { db } from "~/db";
@@ -31,15 +31,11 @@ export async function deleteFile(fileId: string) {
     return { error: "Unauthorized" };
   }
 
-  const utApiResult = utApi.deleteFiles([
+  await utApi.deleteFiles([
     file.url.replace("https://6fqomm6kp4.ufs.sh/f/", ""),
   ]);
-  console.log(utApiResult);
 
-  const dbDeleteResult = await db
-    .delete(filesTable)
-    .where(eq(filesTable.id, fileId));
-  console.log(dbDeleteResult);
+  await db.delete(filesTable).where(eq(filesTable.id, fileId));
 
   return { success: true };
 }
