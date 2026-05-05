@@ -16,6 +16,7 @@ import {
 } from "~/components/ui/table";
 import type { filesTable, foldersTable } from "~/db/schema";
 import { UploadButton } from "~/lib/uploadthing";
+import { formatFileSize } from "~/lib/utils";
 
 export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
   const navigate = useRouter();
@@ -36,7 +37,7 @@ export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
       </TableCell>
       <TableCell>
         <a href={file.url} target="_blank" className="flex py-3">
-          {file.size}
+          {formatFileSize(file.size)}
         </a>
       </TableCell>
       <TableCell>
