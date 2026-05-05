@@ -65,7 +65,7 @@ export function SignupForm({
           signupForm.setError("root", { message: ctx.error.message });
         },
         onSuccess: () => {
-          redirect("/company/new");
+          redirect("/drive");
         },
       },
     });
@@ -220,7 +220,7 @@ export function SignupForm({
                   onClick={async () =>
                     await authClient.signIn.social({
                       provider: "google",
-                      callbackURL: "/",
+                      callbackURL: "/drive",
                     })
                   }
                 >

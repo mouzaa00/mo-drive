@@ -58,25 +58,37 @@ export async function onboardUser(userId: string) {
       ownerId: userId,
       parentId: null,
     })
+    .onConflictDoNothing()
     .returning();
 
-  await db.insert(foldersTable).values([
-    {
-      name: "Documents",
-      ownerId: userId,
-      parentId: rootFolder.id,
-    },
-    {
-      name: "Starred",
-      ownerId: userId,
-      parentId: rootFolder.id,
-    },
-    {
-      name: "Photos",
-      ownerId: userId,
-      parentId: rootFolder.id,
-    },
-  ]);
+  const root = rootFolder ?? (await getRootFolderForUser(userId));
 
-  return rootFolder;
+  if (!root) {
+    throw new Error(
+      "Failed to onboard user: could not create or find root folder",
+    );
+  }
+
+  await db
+    .insert(foldersTable)
+    .values([
+      {
+        name: "Documents",
+        ownerId: userId,
+        parentId: root.id,
+      },
+      {
+        name: "Starred",
+        ownerId: userId,
+        parentId: root.id,
+      },
+      {
+        name: "Photos",
+        ownerId: userId,
+        parentId: root.id,
+      },
+    ])
+    .onConflictDoNothing();
+
+  return root;
 }

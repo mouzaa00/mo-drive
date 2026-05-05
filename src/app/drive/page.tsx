@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Button } from "~/components/ui/button";
 import { getRootFolderForUser, onboardUser } from "~/db/queries";
 import { auth } from "~/lib/auth";
+import { OnboardingButton } from "~/components/onboarding-button";
 
 export default async function DrivePage() {
   const session = await auth.api.getSession({
@@ -29,9 +29,7 @@ export default async function DrivePage() {
           redirect(`/f/${rootFolder.id}`);
         }}
       >
-        <Button type="submit" variant="outline">
-          Start onboarding
-        </Button>
+        <OnboardingButton />
       </form>
     </div>
   );
