@@ -31,9 +31,7 @@ export async function deleteFile(fileId: string) {
     return { error: "Unauthorized" };
   }
 
-  await utApi.deleteFiles([
-    file.url.replace("https://6fqomm6kp4.ufs.sh/f/", ""),
-  ]);
+  await utApi.deleteFiles([file.key]);
 
   await db.delete(filesTable).where(eq(filesTable.id, fileId));
 

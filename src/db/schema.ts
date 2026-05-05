@@ -96,6 +96,7 @@ export const filesTable = pgTable(
     name: text("name").notNull(),
     size: integer("size").notNull(),
     url: text("url").notNull(),
+    key: text("key").notNull(),
     parentId: text("parent_id"),
     ownerId: text("owner_id").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
