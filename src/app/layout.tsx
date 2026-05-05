@@ -8,8 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "M8 Drive - Your files, everywhere",
-  description: "Store, share, and collaborate on files from anywhere with M8 Drive.",
+  title: "QuickDrive - Your files, everywhere",
+  description:
+    "Store, share, and collaborate on files from anywhere with QuickDrive.",
 };
 
 export default function RootLayout({

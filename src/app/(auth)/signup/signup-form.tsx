@@ -199,7 +199,11 @@ export function SignupForm({
                 )}
               />
               <Field>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-blue-600"
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="animate-spin" />
