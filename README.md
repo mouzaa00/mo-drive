@@ -18,6 +18,6 @@ Upload file to a cloud drive (using s3)
 - [x] upload files to the right folder
 - [x] allow other types to be uploaded, for now only images are allowed
 - [x] only the owner should be able to delete a file
-- [ ] only the owner of a folder/file should be able to see it
+- [x] only the owner of a folder/file should be able to see it
 - [ ] create a folder, set the current folder as its parent
 - [ ] delete a folder, consider deleting any nested folders/files

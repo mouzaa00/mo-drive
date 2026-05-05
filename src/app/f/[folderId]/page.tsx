@@ -3,7 +3,12 @@ import { redirect } from "next/navigation";
 import { FileBrowser } from "./file-browser";
 import { SignOut } from "~/components/sign-out";
 import { auth } from "~/lib/auth";
-import { getAllParentsForFolder, getFiles, getFolders } from "~/db/queries";
+import {
+  getAllParentsForFolder,
+  getFiles,
+  getFolderById,
+  getFolders,
+} from "~/db/queries";
 
 export default async function DrivePage({
   params,
@@ -19,6 +24,11 @@ export default async function DrivePage({
   }
 
   const { folderId } = await params;
+
+  const folder = await getFolderById(folderId);
+  if (!folder || folder.ownerId !== session.user.id) {
+    return <div>Unauthorized</div>;
+  }
 
   const [folders, files, parents] = await Promise.all([
     getFolders(folderId),
