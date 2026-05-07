@@ -10,7 +10,9 @@ Upload file to a cloud drive (using s3)
 - [x] move folder open state to url
 - [x] add file uploading
 - [x] delete file
-- [ ] home page + onboarding
+- [x] home page + onboarding
+- [ ] folder creation
+- [ ] folder deletion
 
 ## Notes
 
