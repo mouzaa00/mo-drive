@@ -46,7 +46,7 @@ export function LoginForm({
     await authClient.signIn.email({
       email: formData.email.toLowerCase(),
       password: formData.password,
-      callbackURL: "/",
+      callbackURL: "/drive",
       fetchOptions: {
         onError: (ctx) => {
           loginForm.setError("root", { message: ctx.error.message });
@@ -132,11 +132,7 @@ export function LoginForm({
                 )}
               />
               <Field>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-blue-600"
-                >
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="animate-spin" />

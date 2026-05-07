@@ -60,6 +60,7 @@ export function SignupForm({
       email: formData.email.toLowerCase(),
       name: formData.name.toLowerCase(),
       password: formData.password,
+      callbackURL: "/drive",
       fetchOptions: {
         onError: (ctx) => {
           signupForm.setError("root", { message: ctx.error.message });
@@ -199,11 +200,7 @@ export function SignupForm({
                 )}
               />
               <Field>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-blue-600"
-                >
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="animate-spin" />
