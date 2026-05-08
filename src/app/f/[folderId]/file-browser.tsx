@@ -1,11 +1,17 @@
 "use client";
 
-import { FileIcon, FolderIcon, Trash2Icon } from "lucide-react";
+import {
+  EllipsisVertical,
+  FileIcon,
+  FolderIcon,
+  Trash2Icon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment } from "react";
 import { deleteFile } from "~/app/actions";
 import { CreateFolderDialog } from "~/components/create-folder-dailog";
+import { MoreDetails } from "~/components/more-details";
 import { Button } from "~/components/ui/button";
 import {
   Table,
@@ -23,7 +29,7 @@ export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
   const navigate = useRouter();
 
   return (
-    <TableRow className="cursor-pointer hover:bg-muted/50">
+    <TableRow className="cursor-pointer">
       <TableCell>
         <a
           href={file.url}
@@ -62,7 +68,7 @@ export function FolderRow({
   folder: typeof foldersTable.$inferSelect;
 }) {
   return (
-    <TableRow className="cursor-pointer hover:bg-muted/50">
+    <TableRow className="cursor-pointer">
       <TableCell>
         <Link href={`/f/${folder.id}`} className="flex items-center gap-3 py-3">
           <span className="shrink-0">
@@ -76,7 +82,9 @@ export function FolderRow({
           {"—"}
         </Link>
       </TableCell>
-      <TableCell></TableCell>
+      <TableCell>
+        <MoreDetails />
+      </TableCell>
     </TableRow>
   );
 }
