@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment } from "react";
 import { deleteFile } from "~/app/actions";
+import { CreateFolderDialog } from "~/components/create-folder-dailog";
 import { Button } from "~/components/ui/button";
 import {
   Table,
@@ -115,13 +116,7 @@ export function FileBrowser(props: {
             </Fragment>
           ))}
         </nav>
-        <UploadButton
-          endpoint="driveUploader"
-          onClientUploadComplete={() => {
-            navigate.refresh();
-          }}
-          input={{ folderId: props.currentFolderId }}
-        />
+        <CreateFolderDialog parentId={props.currentFolderId} />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -152,6 +147,14 @@ export function FileBrowser(props: {
           </TableBody>
         </Table>
       </div>
+      <div className="mt-4" />
+      <UploadButton
+        endpoint="driveUploader"
+        onClientUploadComplete={() => {
+          navigate.refresh();
+        }}
+        input={{ folderId: props.currentFolderId }}
+      />
     </div>
   );
 }

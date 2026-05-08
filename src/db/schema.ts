@@ -9,7 +9,7 @@ import {
   uuid,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { isNull } from "drizzle-orm";
+import { isNull, not } from "drizzle-orm";
 
 export const membershipRoleEnum = pgEnum("membership_role", [
   "owner",
@@ -130,5 +130,8 @@ export const foldersTable = pgTable(
     uniqueIndex("folder_owner_root_unique")
       .on(table.ownerId)
       .where(isNull(table.parentId)),
+    uniqueIndex("folder_owner_name_unique")
+      .on(table.name, table.ownerId)
+      .where(not(isNull(table.parentId))),
   ],
 );

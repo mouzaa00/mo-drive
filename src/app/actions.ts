@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { UTApi } from "uploadthing/server";
 import { db } from "~/db";
-import { filesTable } from "~/db/schema";
+import { filesTable, foldersTable } from "~/db/schema";
 import { auth } from "~/lib/auth";
 
 const utApi = new UTApi();
@@ -34,6 +34,49 @@ export async function deleteFile(fileId: string) {
   await utApi.deleteFiles([file.key]);
 
   await db.delete(filesTable).where(eq(filesTable.id, fileId));
+
+  return { success: true };
+}
+
+export async function createFolder(name: string, parentId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Unauthorized" };
+  }
+
+  const [parentFolder] = await db
+    .selectDistinct()
+    .from(foldersTable)
+    .where(eq(foldersTable.id, parentId));
+
+  if (!parentFolder) {
+    return { error: "Parent folder not found" };
+  }
+
+  if (parentFolder.ownerId !== session.user.id) {
+    return { error: "Unauthorized" };
+  }
+
+  const [existingFolder] = await db
+    .select()
+    .from(foldersTable)
+    .where(eq(foldersTable.name, name));
+
+  if (existingFolder) {
+    return { error: "A folder with this name already exists." };
+  }
+
+  await db
+    .insert(foldersTable)
+    .values({
+      name,
+      parentId,
+      ownerId: session.user.id,
+    })
+    .returning();
 
   return { success: true };
 }
