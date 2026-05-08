@@ -6,6 +6,8 @@ import {
   ShareIcon,
   TrashIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { deleteFolder } from "~/app/actions";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -17,7 +19,9 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-export function MoreDetails() {
+export function MoreDetails(props: { folderId: string }) {
+  const navigate = useRouter();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,7 +42,13 @@ export function MoreDetails() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem variant="destructive">
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={async () => {
+              await deleteFolder(props.folderId);
+              navigate.refresh();
+            }}
+          >
             <TrashIcon />
             Delete
           </DropdownMenuItem>

@@ -80,3 +80,52 @@ export async function createFolder(name: string, parentId: string) {
 
   return { success: true };
 }
+
+export async function deleteFolder(folderId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Unauthorized" };
+  }
+
+  const [folder] = await db
+    .selectDistinct()
+    .from(foldersTable)
+    .where(eq(foldersTable.id, folderId));
+
+  if (!folder) {
+    return { error: "Folder not found" };
+  }
+
+  if (folder.ownerId !== session.user.id) {
+    return { error: "Unauthorized" };
+  }
+
+  const nestedFolders = await db
+    .select()
+    .from(foldersTable)
+    .where(eq(foldersTable.parentId, folderId));
+
+  const nestedFiles = await db
+    .select()
+    .from(filesTable)
+    .where(eq(filesTable.parentId, folderId));
+
+  if (nestedFiles.length > 0) {
+    nestedFiles.forEach(async (file) => {
+      await deleteFile(file.id);
+    });
+  }
+
+  if (nestedFolders.length > 0) {
+    nestedFolders.forEach(async (nestedFolder) => {
+      await deleteFolder(nestedFolder.id);
+    });
+  }
+
+  await db.delete(foldersTable).where(eq(foldersTable.id, folderId));
+
+  return { success: true };
+}

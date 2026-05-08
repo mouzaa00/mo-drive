@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  EllipsisVertical,
-  FileIcon,
-  FolderIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { FileIcon, FolderIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment } from "react";
@@ -83,7 +78,7 @@ export function FolderRow({
         </Link>
       </TableCell>
       <TableCell>
-        <MoreDetails />
+        <MoreDetails folderId={folder.id} />
       </TableCell>
     </TableRow>
   );
