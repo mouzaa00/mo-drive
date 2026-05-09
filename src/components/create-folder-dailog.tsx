@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { createFolder } from "~/app/actions";
 import { Button } from "~/components/ui/button";
 import {
@@ -20,7 +21,6 @@ import { Label } from "~/components/ui/label";
 
 export function CreateFolderDialog(props: { parentId: string }) {
   const [name, setName] = useState("Untitled folder");
-  const [error, setError] = useState<string | null>(null);
   const dialogTriggerRef = useRef<HTMLButtonElement>(null);
 
   const navigate = useRouter();
@@ -31,11 +31,6 @@ export function CreateFolderDialog(props: { parentId: string }) {
         <Button variant="outline">Create Folder</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
-        {error && (
-          <div className="mb-4 rounded-md bg-red-50 p-4">
-            <span className="text-sm font-medium text-red-800">{error}</span>
-          </div>
-        )}
         <DialogHeader>
           <DialogTitle>Create Folder</DialogTitle>
           <DialogDescription>
@@ -59,15 +54,18 @@ export function CreateFolderDialog(props: { parentId: string }) {
           </DialogClose>
           <Button
             onClick={async () => {
-              const result = await createFolder(name, props.parentId);
-              if (result.error) {
-                setError(result.error);
-                return;
-              }
-
-              setError(null);
-              dialogTriggerRef.current?.click();
-              navigate.refresh();
+              toast.promise(
+                async () => await createFolder(name, props.parentId),
+                {
+                  loading: "Creating...",
+                  success: () => {
+                    dialogTriggerRef.current?.click();
+                    navigate.refresh();
+                    return `${name} has been created`;
+                  },
+                  error: (error) => error.message || "An error occurred",
+                },
+              );
             }}
           >
             Create

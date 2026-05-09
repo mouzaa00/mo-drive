@@ -4,6 +4,7 @@ import { FileIcon, FolderIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment } from "react";
+import { toast } from "sonner";
 import { deleteFile } from "~/app/actions";
 import { CreateFolderDialog } from "~/components/create-folder-dailog";
 import { MoreDetails } from "~/components/more-details";
@@ -45,9 +46,15 @@ export function FileRow({ file }: { file: typeof filesTable.$inferSelect }) {
       <TableCell>
         <Button
           variant="destructive"
-          onClick={() => {
-            deleteFile(file.id);
-            navigate.refresh();
+          onClick={async () => {
+            toast.promise(async () => await deleteFile(file.id), {
+              loading: "Deleting...",
+              success: (data) => {
+                navigate.refresh();
+                return `${data.fileName} has been deleted`;
+              },
+              error: (error) => error.message || "An error occurred",
+            });
           }}
         >
           <Trash2Icon />

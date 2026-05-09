@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { UTApi } from "uploadthing/server";
 import { db } from "~/db";
@@ -15,7 +15,7 @@ export async function deleteFile(fileId: string) {
   });
 
   if (!session) {
-    return { error: "Unauthorized" };
+    throw new Error("Unauthorized");
   }
 
   const [file] = await db
@@ -24,18 +24,18 @@ export async function deleteFile(fileId: string) {
     .where(eq(filesTable.id, fileId));
 
   if (!file) {
-    return { error: "File not found" };
+    throw new Error("File not found");
   }
 
   if (file.ownerId !== session.user.id) {
-    return { error: "Unauthorized" };
+    throw new Error("Unauthorized");
   }
 
   await utApi.deleteFiles([file.key]);
 
   await db.delete(filesTable).where(eq(filesTable.id, fileId));
 
-  return { success: true };
+  return { success: true, fileName: file.name };
 }
 
 export async function createFolder(name: string, parentId: string) {
@@ -44,7 +44,7 @@ export async function createFolder(name: string, parentId: string) {
   });
 
   if (!session) {
-    return { error: "Unauthorized" };
+    throw new Error("Unauthorized");
   }
 
   const [parentFolder] = await db
@@ -53,20 +53,22 @@ export async function createFolder(name: string, parentId: string) {
     .where(eq(foldersTable.id, parentId));
 
   if (!parentFolder) {
-    return { error: "Parent folder not found" };
+    throw new Error("Parent folder not found");
   }
 
   if (parentFolder.ownerId !== session.user.id) {
-    return { error: "Unauthorized" };
+    throw new Error("Unauthorized");
   }
 
   const [existingFolder] = await db
     .select()
     .from(foldersTable)
-    .where(eq(foldersTable.name, name));
+    .where(
+      and(eq(foldersTable.name, name), eq(foldersTable.parentId, parentId)),
+    );
 
   if (existingFolder) {
-    return { error: "A folder with this name already exists." };
+    throw new Error("A folder with this name already exists.");
   }
 
   await db
@@ -87,7 +89,7 @@ export async function deleteFolder(folderId: string) {
   });
 
   if (!session) {
-    return { error: "Unauthorized" };
+    throw new Error("Unauthorized");
   }
 
   const [folder] = await db
@@ -96,11 +98,11 @@ export async function deleteFolder(folderId: string) {
     .where(eq(foldersTable.id, folderId));
 
   if (!folder) {
-    return { error: "Folder not found" };
+    throw new Error("Folder not found");
   }
 
   if (folder.ownerId !== session.user.id) {
-    return { error: "Unauthorized" };
+    throw new Error("Unauthorized");
   }
 
   const nestedFolders = await db
@@ -127,5 +129,5 @@ export async function deleteFolder(folderId: string) {
 
   await db.delete(foldersTable).where(eq(foldersTable.id, folderId));
 
-  return { success: true };
+  return { success: true, folderName: folder.name };
 }

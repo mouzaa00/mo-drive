@@ -7,6 +7,7 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { deleteFolder } from "~/app/actions";
 
 import { Button } from "~/components/ui/button";
@@ -45,8 +46,14 @@ export function MoreDetails(props: { folderId: string }) {
           <DropdownMenuItem
             variant="destructive"
             onClick={async () => {
-              await deleteFolder(props.folderId);
-              navigate.refresh();
+              toast.promise(async () => await deleteFolder(props.folderId), {
+                loading: "Deleting...",
+                success: (data) => {
+                  navigate.refresh();
+                  return `${data.folderName} has been deleted`;
+                },
+                error: (error) => error.message || "An error occurred",
+              });
             }}
           >
             <TrashIcon />
