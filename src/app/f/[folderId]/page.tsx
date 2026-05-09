@@ -9,6 +9,7 @@ import {
   getFolderById,
   getFolders,
 } from "~/db/queries";
+import Image from "next/image";
 
 export default async function DrivePage({
   params,
@@ -39,9 +40,11 @@ export default async function DrivePage({
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-white px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-600 text-white" />
-          <h1 className="text-xl font-medium text-gray-700">My Drive</h1>
+        <div className="flex items-center gap-3">
+          <Image src="/logo.svg" alt="Logo" width={40} height={40} />
+          <h1 className="text-xl font-medium text-gray-700">
+            <span className="text-blue-700">Fast</span>Drive
+          </h1>
         </div>
         <SignOut />
       </header>
