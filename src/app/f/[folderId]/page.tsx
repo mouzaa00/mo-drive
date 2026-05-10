@@ -1,8 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { FileBrowser } from "./file-browser";
-import { SignOut } from "~/components/sign-out";
-import { auth } from "~/lib/auth";
 import {
   getAllParentsForFolder,
   getFiles,
@@ -10,6 +8,8 @@ import {
   getFolders,
 } from "~/db/queries";
 import Image from "next/image";
+import { UserNav } from "./user-nav";
+import { auth } from "~/lib/auth";
 
 export default async function DrivePage({
   params,
@@ -46,7 +46,7 @@ export default async function DrivePage({
             <span className="text-blue-700">Fast</span>Drive
           </h1>
         </div>
-        <SignOut />
+        <UserNav user={session.user} />
       </header>
       <main className="w-full max-w-none p-6">
         <FileBrowser
