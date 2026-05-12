@@ -60,11 +60,16 @@ export async function createFolder(name: string, parentId: string) {
     throw new Error("Unauthorized");
   }
 
+  const trimmedName = name.trim();
+
   const [existingFolder] = await db
     .select()
     .from(foldersTable)
     .where(
-      and(eq(foldersTable.name, name), eq(foldersTable.parentId, parentId)),
+      and(
+        eq(foldersTable.name, trimmedName),
+        eq(foldersTable.parentId, parentId),
+      ),
     );
 
   if (existingFolder) {
