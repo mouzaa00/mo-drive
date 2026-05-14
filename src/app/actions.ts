@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { UTApi } from "uploadthing/server";
 import { db } from "~/db";
@@ -38,13 +39,27 @@ export async function deleteFile(fileId: string) {
   return { success: true, fileName: file.name };
 }
 
-export async function createFolder(name: string, parentId: string) {
+export async function createFolder(
+  prevState: { error: string; success: boolean; fields: { name: string } },
+  formData: FormData,
+) {
+  const name = formData.get("name") as string;
+  const parentId = formData.get("parentId") as string;
+
+  if (!name || !parentId) {
+    return {
+      error: "Name and parentId are required",
+      success: false,
+      fields: { name },
+    };
+  }
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) {
-    throw new Error("Unauthorized");
+    return { error: "Unauthorized", success: false, fields: { name } };
   }
 
   const [parentFolder] = await db
@@ -53,11 +68,15 @@ export async function createFolder(name: string, parentId: string) {
     .where(eq(foldersTable.id, parentId));
 
   if (!parentFolder) {
-    throw new Error("Parent folder not found");
+    return {
+      error: "Parent folder not found",
+      success: false,
+      fields: { name },
+    };
   }
 
   if (parentFolder.ownerId !== session.user.id) {
-    throw new Error("Unauthorized");
+    return { error: "Unauthorized", success: false, fields: { name } };
   }
 
   const trimmedName = name.trim();
@@ -73,7 +92,11 @@ export async function createFolder(name: string, parentId: string) {
     );
 
   if (existingFolder) {
-    throw new Error("A folder with this name already exists.");
+    return {
+      error: "A folder with this name already exists.",
+      success: false,
+      fields: { name },
+    };
   }
 
   await db
@@ -85,7 +108,8 @@ export async function createFolder(name: string, parentId: string) {
     })
     .returning();
 
-  return { success: true };
+  revalidatePath(`/f/${parentId}`);
+  return { error: "", success: true, fields: { name: "" } };
 }
 
 export async function deleteFolder(folderId: string) {
